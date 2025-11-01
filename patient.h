@@ -1,33 +1,12 @@
 #include <iostream>
-#include <vector>
-#include <string>
-#include <fstream> 
 
+#include "user.h"
 
-#ifndef USER_H 
-#define USER_H
-
-using namespace std; 
-
-class User {
-    protected: 
-        string username ; 
-        string password ; 
-    public : 
-        virtual void login() = 0 ; 
-        virtual void menu() = 0 ;
-        virtual void signUp() = 0 ; 
-        string getUsername() {return username; }
-}; 
 
 class Patient : public User{
     string patientID ; 
     public : 
         Patient(string id) {patientID = id ; }
-        void signUp() override{
-            cout << "Welcome !!!!!!" << endl ; 
-
-        }
         void login() override {
             cout << "Enter patient username : " ; 
             cin >> username ; 
@@ -40,25 +19,17 @@ class Patient : public User{
             do { 
                 cout << "\nMenu : \n" ; 
                 cout << "\nPatient Menu: \n";
-                cout << "1. Login \n" ; 
-                cout << "2. SignUp \n"; 
-                cout << "3. Add/View Medical Logs\n";
-                cout << "4. Book Appointment\n";
-                cout << "5. Logout\n";
+                cout << "1. Add/View Medical Logs\n";
+                cout << "2. Book Appointment\n";
+                cout << "3. Logout\n";
                 cin >> choice;
                 switch(choice) {
                     case 1:
-                        login();
+                        addViewLogs();
                         break;
                     case 2:
-                        signUp();
+                        bookAppointment();
                         break;
-                    case 3 : 
-                        addViewLogs();
-                        break ; 
-                    case 4 : 
-                        bookAppointment() ; 
-                        break ;
             }
             }while( choice != 3) ;
         }
@@ -96,22 +67,3 @@ class Patient : public User{
     }
     string getPatientID() { return patientID; }
 };
-
-class Doctor : public User{
-    string doctorID , speciality; 
-    public : 
-        void login() override{
-            cout << "Enter Doctor Username : " ; 
-            cin >> username ; 
-            cout << "Password : " ; 
-            cin >> password ; 
-
-            
-        }
-};
-
-#endif
-
-int main(){
-    return 0 ; 
-}
