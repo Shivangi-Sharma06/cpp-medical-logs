@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <ctime>
+#include <iomanip>
 #include "nlohmann/json.hpp"
 using namespace std;
 using json = nlohmann::json;
@@ -30,13 +31,13 @@ private:
     }
 
 public:
-    void addLog(const string &patient_id, const string &report) {
+    // ✅ Now returns bool instead of void
+    bool addLog(const string &patient_id, const string &report) {
         json data = loadLogs();
         bool found = false;
 
         for (auto &entry : data) {
             if (entry["patient_id"] == patient_id) {
-                // Append to existing logs
                 entry["logs"].push_back({
                     {"date", currentDate()},
                     {"report", report}
@@ -47,7 +48,6 @@ public:
         }
 
         if (!found) {
-            // New patient entry
             data.push_back({
                 {"patient_id", patient_id},
                 {"logs", json::array({
@@ -58,9 +58,11 @@ public:
 
         saveLogs(data);
         cout << "✅ Log added successfully for patient ID: " << patient_id << endl;
+        return true; // <-- added return
     }
 
-    void viewLogs(const string &patient_id) {
+    // ✅ Change to return bool for consistency
+    bool viewLogs(const string &patient_id) {
         json data = loadLogs();
         for (auto &entry : data) {
             if (entry["patient_id"] == patient_id) {
@@ -68,13 +70,15 @@ public:
                 for (auto &log : entry["logs"]) {
                     cout << "Date: " << log["date"] << "\nReport: " << log["report"] << "\n---\n";
                 }
-                return;
+                return true;
             }
         }
         cout << "⚠️ No logs found for patient ID: " << patient_id << endl;
+        return false;
     }
 
-    void updateLog(const string &patient_id, const string &newReport) {
+    // ✅ Now returns bool instead of void
+    bool updateLog(const string &patient_id, const string &newReport) {
         json data = loadLogs();
         bool updated = false;
 
@@ -92,10 +96,30 @@ public:
         if (updated) {
             saveLogs(data);
             cout << "🩺 Log updated successfully for patient " << patient_id << endl;
+            return true;
         } else {
             cout << "⚠️ No existing logs found for " << patient_id << ". Try adding a log first.\n";
+            return false;
         }
     }
+    Json::Value getLogs(const string &patient_id) {
+        json data = loadLogs();
+        Json::Value logs(Json::arrayValue);
+
+        for (auto &entry : data) {
+            if (entry["patient_id"] == patient_id) {
+                for (auto &log : entry["logs"]) {
+                    Json::Value logItem;
+                    logItem["date"] = log["date"].get<string>();
+                    logItem["report"] = log["report"].get<string>();
+                    logs.append(logItem);
+                }
+                break;
+            }
+        }
+        return logs;
+    }
+
 
 private:
     string currentDate() {
