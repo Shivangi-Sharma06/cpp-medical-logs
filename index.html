@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Logs</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script defer src="js/main.js"></script>
+
+</head>
+
+<body>
+
+    <header id="main-header">
+        <nav>
+            <h1>My Health Reports</h1>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Upload Files</a></li>
+                <li><a href="#">View Reports</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="hero-section">
+        <h2>Store And Access Your Health Logs</h2>
+        <p>Keep track of your health data securely and conveniently.</p>
+        <button id="uploadBtn">Upload Health Log</button>
+    </section>
+
+    <section id="upload-section">
+        <h2>Upload Your Reports</h2>
+        <form id="form1">
+            <label for="fileInput">Select A File:</label>
+            <input type="file" id="fileInput" name="fileInput">
+            <button type="submit">Upload</button>
+        </form>
+    </section>
+
+    <section id="report-section">
+        <h2>Your Uploaded Reports</h2>
+        <div id="report-container">
+            <p>no reports here yet!</p>
+        </div>
+    </section>
+
+</body>
+</html>
