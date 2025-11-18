@@ -16,7 +16,9 @@ public:
             return;
         }
         patientID = AuthManager::generatePatientID(PATIENT_FILE);
-        data.push_back({{"patient_id", patientID}, {"username", username}, {"password", password}});
+        // store hashed password
+        string hpw = AuthManager::hashPassword(password);
+        data.push_back({{"patient_id", patientID}, {"username", username}, {"password", hpw}});
         AuthManager::saveCredentials(PATIENT_FILE, data);
         cout << "Patient registered successfully. Patient ID: " << patientID << endl;
     }

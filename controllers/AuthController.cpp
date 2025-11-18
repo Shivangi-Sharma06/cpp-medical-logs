@@ -1,15 +1,17 @@
-#include "PatientController.h"
+#include "AuthController.h"
 #include "../include/Patient.h"
-#include "../include/AuthManager.h"
-#include "../include/MedicalLogManager.h"
+#include "../include/Doctor.h"
+#include <fstream>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
-// Helper: find patient_id in credentials by username
 static std::string findPatientIdByUsername(const std::string &username) {
     const std::string file = "data/patient_credential.json";
-    json users = AuthManager::loadCredentials(file);
+    std::ifstream f(file);
+    if (!f.is_open()) return std::string();
+    nlohmann::json users;
+    try { f >> users; } catch (...) { return std::string(); }
     for (auto &u : users) {
         if (u.contains("username") && u["username"] == username) {
             if (u.contains("patient_id")) return u["patient_id"].get<std::string>();
@@ -25,7 +27,7 @@ static inline void sendJsonResponse(const std::function<void(const HttpResponseP
     callback(resp);
 }
 
-void PatientController::signup(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback) {
+void AuthController::signupPatient(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback) {
     auto jsonReq = req->getJsonObject();
     json resp;
     if (!jsonReq || !jsonReq->isMember("username") || !jsonReq->isMember("password")) {
@@ -37,7 +39,6 @@ void PatientController::signup(const HttpRequestPtr &req, std::function<void(con
     std::string username = (*jsonReq)["username"].asString();
     std::string password = (*jsonReq)["password"].asString();
 
-    // If username exists -> reject
     if (AuthManager::userExists("data/patient_credential.json", username)) {
         resp["error"] = "Username already exists";
         sendJsonResponse(callback, resp);
@@ -45,9 +46,8 @@ void PatientController::signup(const HttpRequestPtr &req, std::function<void(con
     }
 
     Patient p(username, password);
-    p.signUp(); // writes the patient_id to file
+    p.signUp();
 
-    // Retrieve the generated ID from file
     std::string patientId = findPatientIdByUsername(username);
     resp["message"] = "Patient registered successfully";
     if (!patientId.empty()) resp["patient_id"] = patientId;
@@ -56,7 +56,7 @@ void PatientController::signup(const HttpRequestPtr &req, std::function<void(con
     sendJsonResponse(callback, resp);
 }
 
-void PatientController::login(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback) {
+void AuthController::loginPatient(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback) {
     auto jsonReq = req->getJsonObject();
     json resp;
     if (!jsonReq || !jsonReq->isMember("username") || !jsonReq->isMember("password")) {
@@ -71,7 +71,6 @@ void PatientController::login(const HttpRequestPtr &req, std::function<void(cons
     Patient p(username, password);
     bool ok = p.login();
     if (ok) {
-        // After successful login, load patient_id from file
         std::string pid = findPatientIdByUsername(username);
         resp["login"] = true;
         resp["message"] = "Patient login successful";
@@ -80,48 +79,54 @@ void PatientController::login(const HttpRequestPtr &req, std::function<void(cons
         resp["login"] = false;
         resp["error"] = "Invalid credentials";
     }
-
     sendJsonResponse(callback, resp);
 }
 
-void PatientController::addLog(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback) {
+void AuthController::signupDoctor(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback) {
     auto jsonReq = req->getJsonObject();
     json resp;
-    if (!jsonReq || !jsonReq->isMember("patient_id") || !jsonReq->isMember("report")) {
+    if (!jsonReq || !jsonReq->isMember("username") || !jsonReq->isMember("password")) {
         resp["error"] = "Invalid JSON input";
         sendJsonResponse(callback, resp);
         return;
     }
 
-    std::string pid = (*jsonReq)["patient_id"].asString();
-    std::string report = (*jsonReq)["report"].asString();
+    std::string username = (*jsonReq)["username"].asString();
+    std::string password = (*jsonReq)["password"].asString();
 
-    MedicalLogManager mgr;
-    bool ok = mgr.addLog(pid, report);
-    if (ok) resp["message"] = "Log added successfully";
-    else resp["error"] = "Failed to add log (invalid patient_id?)";
+    if (AuthManager::userExists("data/doctor_credential.json", username)) {
+        resp["error"] = "Username already exists";
+        sendJsonResponse(callback, resp);
+        return;
+    }
 
+    Doctor d(username, password);
+    d.signUp();
+
+    resp["message"] = "Doctor registered successfully";
     sendJsonResponse(callback, resp);
 }
 
-void PatientController::viewLogs(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback) {
+void AuthController::loginDoctor(const HttpRequestPtr& req, std::function<void (const HttpResponsePtr &)> &&callback) {
     auto jsonReq = req->getJsonObject();
     json resp;
-    if (!jsonReq || !jsonReq->isMember("patient_id")) {
+    if (!jsonReq || !jsonReq->isMember("username") || !jsonReq->isMember("password")) {
         resp["error"] = "Invalid JSON input";
         sendJsonResponse(callback, resp);
         return;
     }
 
-    std::string pid = (*jsonReq)["patient_id"].asString();
-    MedicalLogManager mgr;
-    Json::Value cppLogs = mgr.getLogs(pid);
-    Json::StreamWriterBuilder wbuilder;
-    std::string s = Json::writeString(wbuilder, cppLogs);
-    json logs;
-    try { logs = json::parse(s); } catch (...) { logs = json::array(); }
+    std::string username = (*jsonReq)["username"].asString();
+    std::string password = (*jsonReq)["password"].asString();
 
-    resp["patient_id"] = pid;
-    resp["logs"] = logs;
+    Doctor d(username, password);
+    bool ok = d.login();
+    if (ok) {
+        resp["login"] = true;
+        resp["message"] = "Doctor login successful";
+    } else {
+        resp["login"] = false;
+        resp["error"] = "Invalid credentials";
+    }
     sendJsonResponse(callback, resp);
 }

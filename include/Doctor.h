@@ -15,7 +15,8 @@ class Doctor : public User{
                 cout << "Doctor already Exists \n" ; 
                 return ; 
             }
-            data.push_back({{"username" , username} , {"password" , password}});
+            string hpw = AuthManager::hashPassword(password);
+            data.push_back({{"username" , username} , {"password" , hpw}});
             AuthManager::saveCredentials(DOCTOR_FILE , data) ; 
             cout << "Doctor Registered Successfully\n" ; 
         }

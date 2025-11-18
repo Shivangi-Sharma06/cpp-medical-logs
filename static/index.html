@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Logs</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script defer src="js/main.js"></script>
+
+</head>
+
+<body>
+
+    <header id="main-header">
+        <nav>
+            <h1>My Health Reports</h1>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Upload Files</a></li>
+                <li><a href="#">View Reports</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="hero-section">
+        <h2>Store And Access Your Health Logs</h2>
+        <p>Keep track of your health data securely and conveniently.</p>
+        <button id="uploadBtn">Upload Health Log</button>
+    </section>
+
+    <section id="upload-section">
+        <h2>Upload Your Reports</h2>
+        <form id="form1">
+            <label for="fileInput">Select A File:</label>
+            <input type="file" id="fileInput" name="fileInput">
+            <button type="submit">Upload</button>
+        </form>
+    </section>
+
+    <section id="report-section">
+        <h2>Your Uploaded Reports</h2>
+        <div id="report-container">
+            <p>no reports here yet!</p>
+        </div>
+    </section>
+
+    <!-- Demo panel for calling backend endpoints -->
+    <section id="demo-panel" style="padding:24px; max-width:900px; margin:0 auto;">
+        <h3 style="margin-bottom:8px;">Demo (Patient)</h3>
+
+        <div style="display:flex; gap:8px; margin-bottom:12px; align-items:center;">
+            <input id="p-username" placeholder="username" style="padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:#fff;">
+            <input id="p-password" type="password" placeholder="password" style="padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:#fff;">
+            <button id="signup-patient" style="padding:8px 12px; border-radius:8px;">Signup</button>
+            <button id="login-patient" style="padding:8px 12px; border-radius:8px;">Login</button>
+        </div>
+
+        <div id="patient-actions" style="display:none; gap:8px; margin-bottom:12px;">
+            <input id="patient-id" placeholder="patient_id" style="padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:#fff; width:220px;">
+            <textarea id="patient-report" placeholder="report text" rows="3" style="padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:#fff; width:400px;"></textarea>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+                <button id="add-log" style="padding:8px 12px; border-radius:8px;">Add Log</button>
+                <button id="view-logs" style="padding:8px 12px; border-radius:8px;">View Logs</button>
+            </div>
+        </div>
+
+        <pre id="output" style="background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; color:#fff; white-space:pre-wrap; max-height:240px; overflow:auto;"></pre>
+    </section>
+
+</body>
+</html>

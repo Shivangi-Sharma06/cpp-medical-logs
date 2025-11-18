@@ -2,13 +2,23 @@
 #include "../include/Doctor.h"
 #include "../include/MedicalLogManager.h"
 #include "../include/AuthManager.h"
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
+static inline void sendJsonResponse(const std::function<void(const HttpResponsePtr &)> &callback, const json &j) {
+    auto resp = HttpResponse::newHttpResponse();
+    resp->setContentTypeCode(CT_APPLICATION_JSON);
+    resp->setBody(j.dump());
+    callback(resp);
+}
 
 void DoctorController::signup(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback) {
-    Json::Value resp;
     auto jsonReq = req->getJsonObject();
+    json resp;
     if (!jsonReq || !jsonReq->isMember("username") || !jsonReq->isMember("password")) {
         resp["error"] = "Invalid JSON input";
-        callback(HttpResponse::newHttpJsonResponse(resp));
+        sendJsonResponse(callback, resp);
         return;
     }
 
@@ -17,7 +27,7 @@ void DoctorController::signup(const HttpRequestPtr &req, std::function<void(cons
 
     if (AuthManager::userExists("data/doctor_credential.json", username)) {
         resp["error"] = "Username already exists";
-        callback(HttpResponse::newHttpJsonResponse(resp));
+        sendJsonResponse(callback, resp);
         return;
     }
 
@@ -25,15 +35,15 @@ void DoctorController::signup(const HttpRequestPtr &req, std::function<void(cons
     d.signUp(); // writes to file
 
     resp["message"] = "Doctor registered successfully";
-    callback(HttpResponse::newHttpJsonResponse(resp));
+    sendJsonResponse(callback, resp);
 }
 
 void DoctorController::login(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback) {
-    Json::Value resp;
     auto jsonReq = req->getJsonObject();
+    json resp;
     if (!jsonReq || !jsonReq->isMember("username") || !jsonReq->isMember("password")) {
         resp["error"] = "Invalid JSON input";
-        callback(HttpResponse::newHttpJsonResponse(resp));
+        sendJsonResponse(callback, resp);
         return;
     }
 
@@ -50,33 +60,37 @@ void DoctorController::login(const HttpRequestPtr &req, std::function<void(const
         resp["error"] = "Invalid credentials";
     }
 
-    callback(HttpResponse::newHttpJsonResponse(resp));
+    sendJsonResponse(callback, resp);
 }
 
 void DoctorController::viewLogs(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback) {
-    Json::Value resp;
     auto jsonReq = req->getJsonObject();
+    json resp;
     if (!jsonReq || !jsonReq->isMember("patient_id")) {
         resp["error"] = "Invalid JSON input";
-        callback(HttpResponse::newHttpJsonResponse(resp));
+        sendJsonResponse(callback, resp);
         return;
     }
 
     std::string pid = (*jsonReq)["patient_id"].asString();
     MedicalLogManager mgr;
-    Json::Value logs = mgr.getLogs(pid);
+    json logs = json::array();
+    Json::Value cppLogs = mgr.getLogs(pid);
+    Json::StreamWriterBuilder wbuilder;
+    std::string s = Json::writeString(wbuilder, cppLogs);
+    try { logs = json::parse(s); } catch (...) { logs = json::array(); }
 
     resp["patient_id"] = pid;
     resp["logs"] = logs;
-    callback(HttpResponse::newHttpJsonResponse(resp));
+    sendJsonResponse(callback, resp);
 }
 
 void DoctorController::updateLog(const HttpRequestPtr &req, std::function<void(const HttpResponsePtr &)> &&callback) {
-    Json::Value resp;
     auto jsonReq = req->getJsonObject();
+    json resp;
     if (!jsonReq || !jsonReq->isMember("patient_id") || !jsonReq->isMember("updated_report")) {
         resp["error"] = "Invalid JSON input";
-        callback(HttpResponse::newHttpJsonResponse(resp));
+        sendJsonResponse(callback, resp);
         return;
     }
 
@@ -89,5 +103,5 @@ void DoctorController::updateLog(const HttpRequestPtr &req, std::function<void(c
     if (ok) resp["message"] = "Patient log updated successfully";
     else resp["error"] = "Failed to update log";
 
-    callback(HttpResponse::newHttpJsonResponse(resp));
+    sendJsonResponse(callback, resp);
 }
