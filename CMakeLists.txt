@@ -16,6 +16,8 @@
 
 cmake_minimum_required(VERSION 3.10)
 project(MedicalAutomationProject)
+set(CMAKE_TOOLCHAIN_FILE "D:/cpp-medical-logs/vcpkg/scripts/buildsystems/vcpkg.cmake")
+
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

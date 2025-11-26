@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Logs Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+    <div class="logo">
+        <span class="brand">MediLogs</span>
+        <small>Connected care for doctors & patients</small>
+    </div>
+    <div class="status-pill" id="serverStatus">API: not checked</div>
+</header>
+
+<main>
+    <section class="callout">
+        <h1>Medical Logging Dashboard</h1>
+        <p>
+            Use this dashboard to exercise every REST endpoint exposed by the Drogon backend.
+            Each request is sent with JSON payloads and the raw responses are rendered below the form.
+        </p>
+        <div class="callout-actions">
+            <button id="pingApi">Ping API</button>
+            <label>
+                API base URL
+                <input type="url" id="apiBaseInput" placeholder="http://localhost:8080" />
+            </label>
+        </div>
+    </section>
+
+    <section class="grid">
+        <article>
+            <h2>Patient Signup</h2>
+            <form id="patientSignupForm" class="form-card">
+                <label>Username<input name="username" required></label>
+                <label>Password<input name="password" type="password" required></label>
+                <button type="submit">Create Patient</button>
+            </form>
+            <pre class="response" id="patientSignupResp">{}</pre>
+        </article>
+
+        <article>
+            <h2>Patient Login</h2>
+            <form id="patientLoginForm" class="form-card">
+                <label>Username<input name="username" required></label>
+                <label>Password<input name="password" type="password" required></label>
+                <button type="submit">Log In</button>
+            </form>
+            <pre class="response" id="patientLoginResp">{}</pre>
+        </article>
+
+        <article>
+            <h2>Add Patient Log</h2>
+            <form id="patientAddLogForm" class="form-card">
+                <label>Patient ID<input name="patient_id" required placeholder="auto-filled after login"></label>
+                <label>Report<textarea name="report" rows="3" required></textarea></label>
+                <button type="submit">Add Log</button>
+            </form>
+            <pre class="response" id="patientAddLogResp">{}</pre>
+        </article>
+
+        <article>
+            <h2>Patient View Logs</h2>
+            <form id="patientViewLogsForm" class="form-card">
+                <label>Patient ID<input name="patient_id" required placeholder="auto-filled after login"></label>
+                <button type="submit">Fetch Logs</button>
+            </form>
+            <pre class="response" id="patientViewLogsResp">{}</pre>
+        </article>
+    </section>
+
+    <section class="grid">
+        <article>
+            <h2>Doctor Signup</h2>
+            <form id="doctorSignupForm" class="form-card">
+                <label>Username<input name="username" required></label>
+                <label>Password<input name="password" type="password" required></label>
+                <button type="submit">Create Doctor</button>
+            </form>
+            <pre class="response" id="doctorSignupResp">{}</pre>
+        </article>
+
+        <article>
+            <h2>Doctor Login</h2>
+            <form id="doctorLoginForm" class="form-card">
+                <label>Username<input name="username" required></label>
+                <label>Password<input name="password" type="password" required></label>
+                <button type="submit">Log In</button>
+            </form>
+            <pre class="response" id="doctorLoginResp">{}</pre>
+        </article>
+
+        <article>
+            <h2>Doctor View Logs</h2>
+            <form id="doctorViewLogsForm" class="form-card">
+                <label>Patient ID<input name="patient_id" required></label>
+                <button type="submit">Fetch Logs</button>
+            </form>
+            <pre class="response" id="doctorViewLogsResp">{}</pre>
+        </article>
+
+        <article>
+            <h2>Doctor Update Log</h2>
+            <form id="doctorUpdateLogForm" class="form-card">
+                <label>Patient ID<input name="patient_id" required></label>
+                <label>Updated Report<textarea name="updated_report" rows="3" required></textarea></label>
+                <button type="submit">Update Log</button>
+            </form>
+            <pre class="response" id="doctorUpdateLogResp">{}</pre>
+        </article>
+    </section>
+</main>
+
+<footer>
+    <small>
+        REST endpoints exercised:
+        /patient/signup, /patient/login, /patient/add_log, /patient/view_logs,
+        /doctor/signup, /doctor/login, /doctor/view_logs, /doctor/update_log
+    </small>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
+

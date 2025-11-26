@@ -1,3 +1,5 @@
+#ifndef MEDICAL_LOGS_USER_H
+#define MEDICAL_LOGS_USER_H
 #include <iostream>
 #include <vector>
 #include <string>
@@ -17,3 +19,4 @@ class User {
         string getUsername() {return username; }
 }; 
 
+#endif // MEDICAL_LOGS_USER_H

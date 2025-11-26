@@ -1,0 +1,3 @@
+D:/cpp-medical-logs/build/CMakeFiles/MedicalAutomation.dir
+D:/cpp-medical-logs/build/CMakeFiles/ALL_BUILD.dir
+D:/cpp-medical-logs/build/CMakeFiles/ZERO_CHECK.dir

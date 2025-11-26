@@ -1,0 +1,68 @@
+\documentclass[tikz,border=10pt]{standalone}
+\usetikzlibrary{arrows.meta, positioning, shapes.misc, shapes.geometric}
+
+\tikzset{
+    process/.style={rectangle, rounded corners=4pt, draw, align=center, minimum width=3cm, minimum height=1cm},
+    io/.style={trapezium, trapezium left angle=70, trapezium right angle=110, draw, align=center, minimum width=3.2cm, minimum height=1cm},
+    decision/.style={diamond, draw, aspect=2, align=center, inner sep=1pt},
+    terminator/.style={ellipse, draw, align=center, minimum width=2.8cm, minimum height=1cm},
+    arrow/.style={-{Latex[length=3mm]}, thick}
+}
+
+\begin{document}
+\begin{tikzpicture}[node distance=1.7cm]
+    \node[terminator] (start) {Launch UI (`index.html`)};
+    \node[process, below=of start] (chooseRole) {User selects role (Patient / Doctor)};
+
+    % Patient branch
+    \node[process, below left=2.2cm and 1.4cm of chooseRole] (patientCreds) {Enter credentials};
+    \node[process, below=of patientCreds] (patientReq) {Frontend POST \\ `/patient/(signup|login)`};
+    \node[decision, below=of patientReq] (patientAuth) {resp.login?};
+    \node[process, below left=1.5cm and 0.4cm of patientAuth] (patientErr) {Render error};
+    \node[process, below=of patientAuth] (patientDashboard) {Show patient tools};
+    \node[process, below left=1.8cm and -0.1cm of patientDashboard] (patientAddLog) {POST `/patient/add_log`};
+    \node[process, below right=1.8cm and -0.1cm of patientDashboard] (patientViewLogs) {POST `/patient/view_logs`};
+
+    % Doctor branch
+    \node[process, below right=2.2cm and 1.4cm of chooseRole] (doctorCreds) {Enter credentials};
+    \node[process, below=of doctorCreds] (doctorReq) {Frontend POST \\ `/doctor/(signup|login)`};
+    \node[decision, below=of doctorReq] (doctorAuth) {resp.login?};
+    \node[process, below right=1.5cm and 0.4cm of doctorAuth] (doctorErr) {Render error};
+    \node[process, below=of doctorAuth] (doctorDashboard) {Show doctor tools};
+    \node[process, below left=1.8cm and -0.1cm of doctorDashboard] (doctorViewLogs) {POST `/doctor/view_logs`};
+    \node[process, below right=1.8cm and -0.1cm of doctorDashboard] (doctorUpdateLog) {POST `/doctor/update_log`};
+
+    % Storage
+    \node[io, below=5.2cm of patientDashboard] (storage) {JSON storage\\`data/patient_credential.json`\\`data/doctor_credential.json`\\medical logs};
+    \node[terminator, below=of storage] (end) {Response shown in UI};
+
+    % Connections
+    \draw[arrow] (start) -- (chooseRole);
+    \draw[arrow] (chooseRole.west) |- (patientCreds);
+    \draw[arrow] (chooseRole.east) |- (doctorCreds);
+
+    \draw[arrow] (patientCreds) -- (patientReq);
+    \draw[arrow] (patientReq) -- (patientAuth);
+    \draw[arrow] (patientAuth.west) -- node[above]{no} (patientErr);
+    \draw[arrow] (patientAuth) -- node[right]{yes} (patientDashboard);
+    \draw[arrow] (patientDashboard) -- (patientAddLog);
+    \draw[arrow] (patientDashboard) -- (patientViewLogs);
+
+    \draw[arrow] (doctorCreds) -- (doctorReq);
+    \draw[arrow] (doctorReq) -- (doctorAuth);
+    \draw[arrow] (doctorAuth.east) -- node[above]{no} (doctorErr);
+    \draw[arrow] (doctorAuth) -- node[right]{yes} (doctorDashboard);
+    \draw[arrow] (doctorDashboard) -- (doctorViewLogs);
+    \draw[arrow] (doctorDashboard) -- (doctorUpdateLog);
+
+    \draw[arrow] (patientAddLog) -- (storage);
+    \draw[arrow] (patientViewLogs) -- (storage);
+    \draw[arrow] (doctorViewLogs) -- (storage);
+    \draw[arrow] (doctorUpdateLog) -- (storage);
+
+    \draw[arrow] (patientErr) |- (end);
+    \draw[arrow] (doctorErr) |- (end);
+    \draw[arrow] (storage) -- (end);
+\end{tikzpicture}
+\end{document}
+

@@ -9,8 +9,9 @@
     "threads": 4
   },
   "plugins": [],
-  "document_root": "./views",
+  "document_root": "./frontend",
   "static": {
+    "enable": true,
     "index": "index.html"
   }
 }
